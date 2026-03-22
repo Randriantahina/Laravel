@@ -6,7 +6,7 @@ use App\DTOs\TodoDTO;
 use App\Models\Todo;
 use App\Repositories\Contracts\TodoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 class TodoRepository implements TodoRepositoryInterface
 {
