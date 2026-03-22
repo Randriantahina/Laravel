@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Foundation\Http\Attributes\StopOnFirstFailure;
 use Illuminate\Foundation\Http\FormRequest;
 
+#[StopOnFirstFailure]
 class UpdateTodoRequest extends FormRequest
 {
   public function authorize(): bool

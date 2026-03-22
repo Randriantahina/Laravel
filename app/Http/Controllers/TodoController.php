@@ -6,9 +6,11 @@ use App\DTOs\TodoDTO;
 use App\Http\Requests\StoreTodoRequest;
 use App\Http\Requests\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
+use App\Models\User;
 use App\Services\TodoService;
+use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,46 +20,46 @@ class TodoController extends Controller
     private readonly TodoService $service,
   ) {}
 
-  public function index(Request $request): Response
+  public function index(#[CurrentUser] User $user): Response
   {
-    $todos = $this->service->listForUser($request->user()->id);
+    $todos = $this->service->listForUser($user->id);
 
     return Inertia::render('todos/index', [
       'todos' => TodoResource::collection($todos)->resolve(),
     ]);
   }
 
-  public function store(StoreTodoRequest $request): RedirectResponse
+  public function store(StoreTodoRequest $request, #[CurrentUser] User $user): RedirectResponse
   {
-    $this->service->create(
-      $request->user()->id,
-      TodoDTO::fromArray($request->validated()),
-    );
+    $this->service->create($user->id, TodoDTO::fromArray($request->validated()));
 
     return back();
   }
 
-  public function update(UpdateTodoRequest $request, int $id): RedirectResponse
-  {
-    $this->service->update(
-      $id,
-      $request->user()->id,
-      TodoDTO::fromArray($request->validated()),
-    );
+  public function update(
+    UpdateTodoRequest $request,
+    #[RouteParameter('id')] int $id,
+    #[CurrentUser] User $user,
+  ): RedirectResponse {
+    $this->service->update($id, $user->id, TodoDTO::fromArray($request->validated()));
 
     return back();
   }
 
-  public function toggle(Request $request, int $id): RedirectResponse
-  {
-    $this->service->toggle($id, $request->user()->id);
+  public function toggle(
+    #[RouteParameter('id')] int $id,
+    #[CurrentUser] User $user,
+  ): RedirectResponse {
+    $this->service->toggle($id, $user->id);
 
     return back();
   }
 
-  public function destroy(Request $request, int $id): RedirectResponse
-  {
-    $this->service->delete($id, $request->user()->id);
+  public function destroy(
+    #[RouteParameter('id')] int $id,
+    #[CurrentUser] User $user,
+  ): RedirectResponse {
+    $this->service->delete($id, $user->id);
 
     return back();
   }
